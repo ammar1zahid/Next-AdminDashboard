@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { addUser } from "@/app/lib/actions";
 import styles from "../../../components/dashboard/users/addUser/addUser.module.css";
 

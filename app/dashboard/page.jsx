@@ -4,7 +4,7 @@ import styles from '../components/dashboard/dashboard.module.css'
  import Rightbar from '../components/dashboard/rightbar/rightbar'
 import Transactions from '../components/dashboard/transactions/transactions'
 import { cards } from "../lib/data";
-
+export const dynamic = "force-dynamic";
 
 function Dashboard() {
   return (

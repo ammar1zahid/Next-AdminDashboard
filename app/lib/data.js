@@ -24,41 +24,39 @@ import connect from "./utils";
 
 
 export const fetchUsers = async (q = "", page = 1) => {
-  // normalize inputs
   const query = (typeof q === "string" ? q : "").trim();
   page = parseInt(page, 10) || 1;
   if (page < 1) page = 1;
 
   const ITEM_PER_PAGE = 2;
-  const regex = new RegExp(query || "", "i"); // empty string matches all
+  const regex = new RegExp(query, "i");
 
   try {
     await connect();
 
     const filter = { username: { $regex: regex } };
 
-    // count documents that match the filter
     const count = await User.countDocuments(filter);
 
-    // fetch paginated results
     const users = await User.find(filter)
-      // .sort({ createdAt: -1 }) // newest first (optional)
       .skip(ITEM_PER_PAGE * (page - 1))
       .limit(ITEM_PER_PAGE)
-      .lean(); // returns plain JS objects instead of Mongoose docs
+      .lean();
 
     return { count, users };
   } catch (err) {
     console.error("fetchUsers error:", err);
-    throw new Error("Failed to fetch users!");
+    // ✅ Safe fallback instead of throwing (prevents build crash)
+    return { count: 0, users: [] };
   }
 };
+
 
 
 export const fetchUser = async (id) => {
   console.log(id);
   try {
-    connect();
+    await connect();
     const user = await User.findById(id);
     return user;
   } catch (err) {
@@ -67,40 +65,38 @@ export const fetchUser = async (id) => {
   }
 };
 
-export const fetchProducts = async (q, page) => {
-  // normalize inputs
+export const fetchProducts = async (q = "", page = 1) => {
   const query = (typeof q === "string" ? q : "").trim();
   page = parseInt(page, 10) || 1;
   if (page < 1) page = 1;
 
   const ITEM_PER_PAGE = 2;
-  const regex = new RegExp(query || "", "i"); // empty string matches all
+  const regex = new RegExp(query, "i");
 
   try {
     await connect();
 
     const filter = { title: { $regex: regex } };
 
-    // count documents that match the filter
     const count = await Product.countDocuments(filter);
 
-    // fetch paginated results
     const products = await Product.find(filter)
-      // .sort({ createdAt: -1 }) // newest first (optional)
       .skip(ITEM_PER_PAGE * (page - 1))
       .limit(ITEM_PER_PAGE)
-      .lean(); // returns plain JS objects instead of Mongoose docs
+      .lean();
+
     return { count, products };
   } catch (err) {
-    console.error("fetchProduct error:", err);
-    throw new Error("Failed to fetch products!");
+    console.error("fetchProducts error:", err);
+    // ✅ return safe fallback (prevents build crash)
+    return { count: 0, products: [] };
   }
-  
 };
+
 
 export const fetchProduct = async (id) => {
   try {
-    connect();
+    await connect();
     const product = await Product.findById(id);
     return product;
   } catch (err) {

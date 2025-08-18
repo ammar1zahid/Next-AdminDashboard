@@ -1,5 +1,5 @@
-// auth.node.js
-"use server";
+// auth-node.js
+// Node-only providers (DO NOT add "use server" here because it exports an array)
 
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";

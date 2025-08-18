@@ -1,5 +1,5 @@
 // app/lib/models.js
-"use server";
+
 
 import mongoose from "mongoose";
 

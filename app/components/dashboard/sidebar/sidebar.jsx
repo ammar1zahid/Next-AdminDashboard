@@ -1,5 +1,8 @@
+// app/components/dashboard/sidebar/sidebar.jsx
+"use client";
+
 import Image from "next/image";
-import styles from './sidebar.module.css'
+import styles from "./sidebar.module.css";
 import {
   MdDashboard,
   MdSupervisedUserCircle,
@@ -12,18 +15,14 @@ import {
   MdHelpCenter,
   MdLogout,
 } from "react-icons/md";
-import MenuLink from './menuLink/menuLink';
-import { auth, signOut } from "@/auth";
+import MenuLink from "./menuLink/menuLink";
+import { useSession, signOut } from "next-auth/react";
 
 const menuItems = [
   {
     title: "Pages",
     list: [
-      {
-        title: "Dashboard",
-        path: "/dashboard",
-        icon: <MdDashboard />,
-      },
+      { title: "Dashboard", path: "/dashboard", icon: <MdDashboard /> },
       {
         title: "Users",
         path: "/dashboard/users",
@@ -44,21 +43,9 @@ const menuItems = [
   {
     title: "Analytics",
     list: [
-      {
-        title: "Revenue",
-        path: "/dashboard/revenue",
-        icon: <MdWork />,
-      },
-      {
-        title: "Reports",
-        path: "/dashboard/reports",
-        icon: <MdAnalytics />,
-      },
-      {
-        title: "Teams",
-        path: "/dashboard/teams",
-        icon: <MdPeople />,
-      },
+      { title: "Revenue", path: "/dashboard/revenue", icon: <MdWork /> },
+      { title: "Reports", path: "/dashboard/reports", icon: <MdAnalytics /> },
+      { title: "Teams", path: "/dashboard/teams", icon: <MdPeople /> },
     ],
   },
   {
@@ -69,24 +56,20 @@ const menuItems = [
         path: "/dashboard/settings",
         icon: <MdOutlineSettings />,
       },
-      {
-        title: "Help",
-        path: "/dashboard/help",
-        icon: <MdHelpCenter />,
-      },
+      { title: "Help", path: "/dashboard/help", icon: <MdHelpCenter /> },
     ],
   },
 ];
 
-async function Sidebar() {
-  // Get session data
-  const session = await auth();
+export default function Sidebar() {
+  const { data: session } = useSession();
   const user = session?.user;
-
-  // Handle logout
-  const handleLogout = async () => {
-    "use server";
-    await signOut({ redirectTo: "/login" });
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/login" });
+    } catch (err) {
+      console.error("signOut error:", err);
+    }
   };
 
   return (
@@ -96,8 +79,8 @@ async function Sidebar() {
           className={styles.userImage}
           src={user?.img || "/noavatar.png"}
           alt="User Avatar"
-          width="50"
-          height="50"
+          width={50}
+          height={50}
         />
         <div className={styles.userDetail}>
           <span className={styles.username}>
@@ -108,24 +91,22 @@ async function Sidebar() {
           </span>
         </div>
       </div>
+
       <ul className={styles.list}>
-        {menuItems.map(cat=>(
+        {menuItems.map((cat) => (
           <li key={cat.title}>
             <span className={styles.cat}>{cat.title}</span>
-            {cat.list.map(item=>(
+            {cat.list.map((item) => (
               <MenuLink item={item} key={item.title} />
             ))}
           </li>
         ))}
       </ul>
-      <form action={handleLogout}>
-        <button type="submit" className={styles.logout}>
-          <MdLogout />
-          Logout
-        </button>
-      </form>
-    </div>
-  )
-}
 
-export default Sidebar
+      <button type="button" className={styles.logout} onClick={handleSignOut}>
+        <MdLogout />
+        Logout
+      </button>
+    </div>
+  );
+}

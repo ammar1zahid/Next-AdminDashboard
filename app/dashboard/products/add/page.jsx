@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { addProduct } from "@/app/lib/actions";
 import styles from "../../../components/dashboard/products/addProduct/addProduct.module.css";
 
