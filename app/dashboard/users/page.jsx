@@ -11,11 +11,11 @@ export const dynamic = "force-dynamic";
 
 async function UsersPage({ searchParams }) {
   try {
-    // ✅ no await here
-    const q = searchParams?.q || "";
-    const page = Number(searchParams?.page) || 1;
+    // await searchParams before using it
+    const params = await searchParams;
+    const q = params?.q || "";
+    const page = Number(params?.page) || 1;
 
-    // ✅ fetch with safe fallback
     const { count = 0, users = [] } = (await fetchUsers(q, page)) || {};
 
     return (

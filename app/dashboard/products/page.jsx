@@ -8,8 +8,10 @@ import { deleteProduct } from "@/app/lib/actions";
 export const dynamic = "force-dynamic";
 
 const ProductsPage = async ({ searchParams }) => {
-  const q = searchParams?.q || "";
-  const page = searchParams?.page || 1;
+  // await searchParams before reading its props
+  const params = await searchParams;
+  const q = params?.q || "";
+  const page = params?.page || 1;
 
   let count = 0;
   let products = [];
