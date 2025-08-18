@@ -13,7 +13,7 @@ import {
   MdLogout,
 } from "react-icons/md";
 import MenuLink from './menuLink/menuLink';
-
+import { auth, signOut } from "@/auth";
 
 const menuItems = [
   {
@@ -78,23 +78,34 @@ const menuItems = [
   },
 ];
 
-function Sidebar() {
+async function Sidebar() {
+  // Get session data
+  const session = await auth();
+  const user = session?.user;
+
+  // Handle logout
+  const handleLogout = async () => {
+    "use server";
+    await signOut({ redirectTo: "/login" });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.user}>
         <Image
           className={styles.userImage}
-          src={
-            // user.img || 
-            "/noavatar.png"}
-          alt=""
+          src={user?.img || "/noavatar.png"}
+          alt="User Avatar"
           width="50"
           height="50"
         />
         <div className={styles.userDetail}>
-          {/* <span className={styles.username}>{user.username}</span> */}
-          <span className={styles.username}>ammar</span>
-          <span className={styles.userTitle}>Administrator</span>
+          <span className={styles.username}>
+            {user?.username || user?.email || "Guest"}
+          </span>
+          <span className={styles.userTitle}>
+            {user?.isAdmin ? "Administrator" : "User"}
+          </span>
         </div>
       </div>
       <ul className={styles.list}>
@@ -107,10 +118,12 @@ function Sidebar() {
           </li>
         ))}
       </ul>
-      <button className={styles.logout}>
+      <form action={handleLogout}>
+        <button type="submit" className={styles.logout}>
           <MdLogout />
           Logout
-      </button>
+        </button>
+      </form>
     </div>
   )
 }
