@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import styles from "./loginForm.module.css";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,8 +20,15 @@ export default function LoginForm() {
       const username = form.get("username");
       const password = form.get("password");
 
+      // const res = await signIn("credentials", {
+      //   redirect: false,
+      //   username,
+      //   password,
+      // });
+
       const res = await signIn("credentials", {
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard",
         username,
         password,
       });
@@ -33,10 +40,10 @@ export default function LoginForm() {
         return;
       }
 
-      // Ensure session is updated before redirect
-      setTimeout(() => {
-        router.replace("/dashboard");
-      }, 100);
+      // // Ensure session is updated before redirect
+      // setTimeout(() => {
+      //   router.replace("/dashboard");
+      // }, 100);
     } catch (err) {
       console.error("Login error:", err);
       setLoading(false);
