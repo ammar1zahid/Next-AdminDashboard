@@ -21,24 +21,22 @@ export default function LoginForm() {
       const password = form.get("password");
 
       const res = await signIn("credentials", {
-        // redirect: false,
+        redirect: false,
         username,
         password,
-        callbackUrl: "/dashboard",
       });
 
-      // setLoading(false);
+      setLoading(false);
 
       if (res?.error) {
-        setLoading(false);
         setError(res.error || "Invalid credentials");
         return;
       }
 
-      // Ensure session is updated before redirect
-      // setTimeout(() => {
-      //   router.replace("/dashboard");
-      // }, 3000);
+      if (res?.ok) {
+        // Use window.location for reliable redirect
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       console.error("Login error:", err);
       setLoading(false);
