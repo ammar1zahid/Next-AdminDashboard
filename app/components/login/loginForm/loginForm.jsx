@@ -60,14 +60,34 @@ export default function LoginForm() {
             });
             
             if (session?.user) {
-              console.log("✅ [LoginForm] Session verified! Redirecting to dashboard");
-              router.push("/dashboard");
+              console.log("✅ [LoginForm] Session verified! Trying multiple redirect methods");
               
-              // Fallback redirect after 2 seconds if router.push doesn't work
+              // Try multiple redirect methods immediately
+              console.log("🔄 [LoginForm] Method 1: window.location.assign");
+              window.location.assign("/dashboard");
+              
+              // Immediate fallback
               setTimeout(() => {
-                console.log("🔄 [LoginForm] Fallback redirect with window.location");
+                console.log("🔄 [LoginForm] Method 2: window.location.replace");
+                window.location.replace("/dashboard");
+              }, 100);
+              
+              // Another immediate fallback
+              setTimeout(() => {
+                console.log("🔄 [LoginForm] Method 3: window.location.href");
                 window.location.href = "/dashboard";
-              }, 2000);
+              }, 200);
+              
+              // Router methods as fallback
+              setTimeout(() => {
+                console.log("🔄 [LoginForm] Method 4: router.push");
+                router.push("/dashboard");
+              }, 300);
+              
+              setTimeout(() => {
+                console.log("🔄 [LoginForm] Method 5: router.replace");
+                router.replace("/dashboard");
+              }, 400);
               
               return;
             }
