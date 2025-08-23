@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import styles from "./loginForm.module.css";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // const router = useRouter();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,21 +47,24 @@ export default function LoginForm() {
         console.log("🎉 [LoginForm] Login successful! Attempting redirect to dashboard");
         console.log("🌍 [LoginForm] Current location:", window.location.href);
         
-        // Try different redirect approaches
-        console.log("🔄 [LoginForm] Method 1: window.location.href");
-        window.location.href = "/dashboard";
-        
-        // Fallback after 2 seconds
+        // Wait a moment for session to be established, then redirect
+        console.log("⏰ [LoginForm] Waiting 500ms for session establishment");
         setTimeout(() => {
-          console.log("🔄 [LoginForm] Method 2: window.location.replace (fallback)");
-          window.location.replace("/dashboard");
+          console.log("🔄 [LoginForm] Method 1: router.push");
+          router.push("/dashboard");
+          
+          // Fallback with router.replace after 1.5 seconds
+          setTimeout(() => {
+            console.log("🔄 [LoginForm] Method 2: router.replace (fallback)");
+            router.replace("/dashboard");
+            
+            // Final fallback with window.location after 3 seconds
+            setTimeout(() => {
+              console.log("🔄 [LoginForm] Method 3: window.location.href (final fallback)");
+              window.location.href = "/dashboard";
+            }, 3500);
+          }, 5500);
         }, 2000);
-        
-        // Another fallback after 4 seconds
-        setTimeout(() => {
-          console.log("🔄 [LoginForm] Method 3: Full URL redirect (fallback)");
-          window.location.href = window.location.origin + "/dashboard";
-        }, 4000);
       } else {
         console.warn("⚠️ [LoginForm] Login response neither ok nor error:", res);
       }
