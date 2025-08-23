@@ -36,7 +36,7 @@ export default function LoginForm() {
       // Ensure session is updated before redirect
       setTimeout(() => {
         router.replace("/dashboard");
-      }, 100);
+      }, 3000);
     } catch (err) {
       console.error("Login error:", err);
       setLoading(false);
