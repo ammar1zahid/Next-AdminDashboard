@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:next-auth.js.org)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import styles from "./loginForm.module.css";
 
@@ -44,27 +44,56 @@ export default function LoginForm() {
       }
 
       if (res?.ok) {
-        console.log("🎉 [LoginForm] Login successful! Attempting redirect to dashboard");
+        console.log("🎉 [LoginForm] Login successful! Verifying session before redirect");
         console.log("🌍 [LoginForm] Current location:", window.location.href);
         
-        // Wait a moment for session to be established, then redirect
-        console.log("⏰ [LoginForm] Waiting 500ms for session establishment");
-        setTimeout(() => {
-          console.log("🔄 [LoginForm] Method 1: router.push");
-          router.push("/dashboard");
+        // Verify session is established before redirecting
+        const verifySessionAndRedirect = async (attempt = 1) => {
+          console.log(`🔍 [LoginForm] Checking session (attempt ${attempt})`);
           
-          // Fallback with router.replace after 1.5 seconds
-          setTimeout(() => {
-            console.log("🔄 [LoginForm] Method 2: router.replace (fallback)");
-            router.replace("/dashboard");
+          try {
+            const session = await getSession();
+            console.log("👤 [LoginForm] Session check result:", session ? "EXISTS" : "NULL");
+            console.log("👤 [LoginForm] Session details:", {
+              username: session?.user?.username,
+              isAdmin: session?.user?.isAdmin
+            });
             
-            // Final fallback with window.location after 3 seconds
-            setTimeout(() => {
-              console.log("🔄 [LoginForm] Method 3: window.location.href (final fallback)");
+            if (session?.user) {
+              console.log("✅ [LoginForm] Session verified! Redirecting to dashboard");
+              router.push("/dashboard");
+              
+              // Fallback redirect after 2 seconds if router.push doesn't work
+              setTimeout(() => {
+                console.log("🔄 [LoginForm] Fallback redirect with window.location");
+                window.location.href = "/dashboard";
+              }, 2000);
+              
+              return;
+            }
+            
+            // If no session and we haven't tried too many times, try again
+            if (attempt < 5) {
+              console.log(`⏰ [LoginForm] No session yet, retrying in ${attempt}00ms (attempt ${attempt + 1})`);
+              setTimeout(() => verifySessionAndRedirect(attempt + 1), attempt * 1000);
+            } else {
+              console.error("❌ [LoginForm] Session verification failed after 5 attempts");
+              setError("Login successful but session not established. Please refresh the page.");
+            }
+          } catch (sessionError) {
+            console.error("💥 [LoginForm] Session check error:", sessionError);
+            if (attempt < 3) {
+              setTimeout(() => verifySessionAndRedirect(attempt + 1), 1000);
+            } else {
+              // Fallback to direct redirect if session check keeps failing
+              console.log("🔄 [LoginForm] Session check failed, attempting direct redirect");
               window.location.href = "/dashboard";
-            }, 3500);
-          }, 5500);
-        }, 2000);
+            }
+          }
+        };
+        
+        // Start session verification
+        verifySessionAndRedirect();
       } else {
         console.warn("⚠️ [LoginForm] Login response neither ok nor error:", res);
       }
