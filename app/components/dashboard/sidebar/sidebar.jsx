@@ -66,7 +66,7 @@ export default function Sidebar() {
   const user = session?.user;
   const handleSignOut = async () => {
     try {
-      await signOut({ callbackUrl: "/login" });
+      await signOut({ callbackUrl: window.location.origin + "/login" });
     } catch (err) {
       console.error("signOut error:", err);
     }
